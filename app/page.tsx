@@ -1,5 +1,9 @@
 import Image from "next/image";
 
-export default function Home() {
-  return <main className="">Home</main>;
+export default async function Home() {
+  return (
+    <main className="">
+      <h1>Home page</h1>
+    </main>
+  );
 }

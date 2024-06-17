@@ -6,26 +6,24 @@ import {
   integer,
   boolean,
   pgEnum,
-  unique,
-  PgTable,
-  serial,
-  real,
-  index,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
+import { createId } from "@paralleldrive/cuid2";
 
-import { InferSelectModel, relations } from "drizzle-orm";
+export const RoleEnum = pgEnum("roles", ["user", "admin"]);
 
 export const users = pgTable("user", {
-  id: text("id").notNull().primaryKey(),
+  id: text("id")
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => createId()),
   name: text("name"),
   email: text("email").notNull(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
   password: text("password"),
   twoFactorEnabled: boolean("twoFactorEnabled").default(false),
-
-  customerID: text("customerID"),
+  role: RoleEnum("roles").default("user"),
 });
 
 export const accounts = pgTable(
@@ -49,5 +47,20 @@ export const accounts = pgTable(
     compoundKey: primaryKey({
       columns: [account.provider, account.providerAccountId],
     }),
+  })
+);
+
+export const emailTokens = pgTable(
+  "email_tokens",
+  {
+    id: text("identifier")
+      .notNull()
+      .$defaultFn(() => createId()),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+    email: text("email").notNull(),
+  },
+  (vt) => ({
+    compoundKey: primaryKey({ columns: [vt.id, vt.token] }),
   })
 );

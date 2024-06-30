@@ -30,6 +30,7 @@ export const emailRegister = action(RegisterSchema, async ({ email, name, passwo
   await db.insert(users).values({
     email,
     name,
+    password: hashedPassword,
   });
 
   const verificationToken = await generateEmailVerificationToken(email);
